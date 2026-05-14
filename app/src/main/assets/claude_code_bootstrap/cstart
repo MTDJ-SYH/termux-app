@@ -1,0 +1,13 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# cstart — launch or reattach to Claude Code tmux session
+
+termux-wake-lock acquire 2>/dev/null
+
+if ! tmux has-session -t main 2>/dev/null; then
+  tmux new-session -d -s main -n claude
+  tmux new-window -t main -n shell
+  tmux new-window -t main -n monitor
+  tmux send-keys -t main:claude "claude" Enter
+fi
+
+exec tmux attach -t main

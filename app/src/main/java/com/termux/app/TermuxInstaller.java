@@ -108,6 +108,11 @@ final class TermuxInstaller {
                 Logger.logInfo(LOG_TAG, "The termux prefix directory \"" + TERMUX_PREFIX_DIR_PATH + "\" exists but is empty or only contains specific unimportant files.");
             } else {
                 whenDone.run();
+
+                // Claude Code Android: run post-bootstrap setup on first launch
+                final File homeDir = new File(
+                    com.termux.shared.termux.TermuxConstants.TERMUX_HOME_DIR_PATH);
+                ClaudeCodeBootstrap.runIfNeeded(activity, homeDir);
                 return;
             }
         } else if (FileUtils.fileExists(TERMUX_PREFIX_DIR_PATH, false)) {
@@ -221,7 +226,14 @@ final class TermuxInstaller {
                     // Recreate env file since termux prefix was wiped earlier
                     TermuxShellEnvironment.writeEnvironmentToFile(activity);
 
-                    activity.runOnUiThread(whenDone);
+                    activity.runOnUiThread(() -> {
+                        whenDone.run();
+
+                        // Claude Code Android: run post-bootstrap setup on first launch
+                        final File homeDir = new File(
+                            com.termux.shared.termux.TermuxConstants.TERMUX_HOME_DIR_PATH);
+                        ClaudeCodeBootstrap.runIfNeeded(activity, homeDir);
+                    });
 
                 } catch (final Exception e) {
                     showBootstrapErrorDialog(activity, whenDone, Logger.getStackTracesMarkdownString(null, Logger.getStackTracesStringArray(e)));

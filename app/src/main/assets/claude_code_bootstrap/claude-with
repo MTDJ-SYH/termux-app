@@ -1,0 +1,30 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# claude-with — launch Claude Code with a specific model provider
+# Usage: claude-with official|deepseek|minimax|relay
+
+source ~/.secrets/keys.env 2>/dev/null
+
+case "${1:-official}" in
+  official)
+    export ANTHROPIC_BASE_URL="https://api.anthropic.com"
+    export ANTHROPIC_API_KEY="${ANTHROPIC_OFFICIAL_KEY:?set ANTHROPIC_OFFICIAL_KEY in ~/.secrets/keys.env}"
+    ;;
+  deepseek)
+    export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+    export ANTHROPIC_API_KEY="${DEEPSEEK_KEY:?set DEEPSEEK_KEY in ~/.secrets/keys.env}"
+    ;;
+  minimax)
+    export ANTHROPIC_BASE_URL="https://api.minimax.io/anthropic"
+    export ANTHROPIC_API_KEY="${MINIMAX_KEY:?set MINIMAX_KEY in ~/.secrets/keys.env}"
+    ;;
+  relay)
+    export ANTHROPIC_BASE_URL="${RELAY_BASE_URL:?set RELAY_BASE_URL in ~/.secrets/keys.env}"
+    export ANTHROPIC_API_KEY="${RELAY_KEY:?set RELAY_KEY in ~/.secrets/keys.env}"
+    ;;
+  *)
+    echo "Usage: claude-with official|deepseek|minimax|relay"
+    exit 1
+    ;;
+esac
+
+exec claude

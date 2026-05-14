@@ -1,0 +1,54 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# restore-env — rebuild Claude Code Android environment after factory reset or on new phone
+
+set -e
+
+echo "=== Claude Code Android Environment Restore ==="
+echo ""
+
+# 1. Base packages
+echo "[1/6] Installing base packages..."
+pkg update -y
+pkg install -y nodejs-lts git tmux openssh python make clang binutils neovim gnupg
+
+# 2. Node.js global packages
+echo "[2/6] Installing Node.js packages..."
+npm install -g @anthropic-ai/claude-code code-server
+
+# 3. Python packages
+echo "[3/6] Installing Python packages..."
+pip install litellm
+
+# 4. Directory structure
+echo "[4/6] Creating directories..."
+mkdir -p ~/projects ~/bin ~/.secrets ~/.termux/boot ~/.config/code-server
+chmod 700 ~/.secrets
+
+# 5. Config files
+echo "[5/6] Copying configuration files..."
+if [ -d /data/data/com.termux/files/conf-backup ]; then
+  cp /data/data/com.termux/files/conf-backup/tmux.conf ~/.tmux.conf
+  cp /data/data/com.termux/files/conf-backup/termux.properties ~/.termux/
+  cp /data/data/com.termux/files/conf-backup/cstart ~/bin/
+  cp /data/data/com.termux/files/conf-backup/claude-with ~/bin/
+  cp /data/data/com.termux/files/conf-backup/restore-env ~/bin/
+  cp /data/data/com.termux/files/conf-backup/code-server.yaml ~/.config/code-server/config.yaml
+  cp /data/data/com.termux/files/conf-backup/litellm_config.yaml ~/
+  chmod +x ~/bin/*
+  echo "  Config files restored from backup."
+else
+  echo "  WARNING: No config backup found. Run bootstrap.sh first if available."
+fi
+
+# 6. Permissions
+echo "[6/6] Setting permissions..."
+termux-setup-storage
+termux-wake-lock acquire
+
+echo ""
+echo "=== Restore complete ==="
+echo "Next steps:"
+echo "  1. Place your GPG-encrypted keys at ~/.secrets/keys.env.gpg"
+echo "  2. Run: claude login"
+echo "  3. Run: cstart"
+echo ""
