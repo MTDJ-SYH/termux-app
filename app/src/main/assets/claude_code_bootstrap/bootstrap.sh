@@ -15,9 +15,17 @@ fail() { echo -e "${RED}[!!]${NC} $*"; exit 1; }
 
 echo ""
 echo "╔══════════════════════════════════════════╗"
-echo "║  Claude Code Android — Setup             ║"
+echo "║  Claude Code Android — Setup (CN)        ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
+
+# ---- Step 0: Set up China mirrors ----
+echo "[0/7] Configuring China mirrors..."
+npm config set registry https://registry.npmmirror.com
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+# Auto-select Tsinghua mirror for termux packages
+echo "Y" | termux-change-repo 2>/dev/null || true
+log "  Mirrors: npm→npmmirror, pip→tsinghua"
 
 # ---- Step 1: Install base packages ----
 echo "[1/7] Installing base packages..."
